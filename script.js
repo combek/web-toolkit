@@ -1,28 +1,45 @@
-// Global variable to store organized file categories for the ZIP export
 let organizedStructure = {};
 
 function organizeFiles() {
     const input = document.getElementById('fileInput').value;
+    const ignoreInput = document.getElementById('ignoreInput').value;
     const outputDiv = document.getElementById('output');
     const downloadBtn = document.getElementById('downloadZipBtn');
     
     if (!input.trim()) {
-        outputDiv.innerHTML = "Please enter at least one file name.";
+        outputDiv.innerHTML = "Будь ласка, введіть хоча б одне ім'я файлу.";
         downloadBtn.style.display = 'none';
         return;
     }
 
+    // Отримуємо список файлів та список масок для ігнорування
     const files = input.split(',').map(f => f.trim()).filter(f => f.length > 0);
-    let resultHTML = "<strong>Sorting Results:</strong><br>";
-    
-    // Reset structure mapping
+    const ignorePatterns = ignoreInput.split(',').map(p => p.trim()).filter(p => p.length > 0);
+
+    let resultHTML = "<strong>Результати сортування:</strong><br>";
     organizedStructure = {};
     
+    let ignoredCount = 0;
+
     files.forEach(file => {
+        // Перевіряємо, чи підпадає файл під правила ігнорування
+        const isIgnored = ignorePatterns.some(pattern => {
+            if (pattern.includes('*')) {
+                // Проста підтримка зірочки (наприклад, temp.*)
+                const regex = new RegExp('^' + pattern.replace('*', '.*') + '$', 'i');
+                return regex.test(file);
+            }
+            return file.toLowerCase() === pattern.toLowerCase();
+        });
+
+        if (isIgnored) {
+            ignoredCount++;
+            return; // Пропускаємо цей файл
+        }
+
         const parts = file.split('.');
         const ext = parts.length > 1 ? parts.pop().toUpperCase() : 'NO_EXTENSION';
         
-        // Group files by category folder
         if (!organizedStructure[ext]) {
             organizedStructure[ext] = [];
         }
@@ -31,25 +48,27 @@ function organizeFiles() {
         resultHTML += `➔ ${file} &nbsp;&nbsp;📂 [/${ext}/]<br>`;
     });
 
+    if (ignoredCount > 0) {
+        resultHTML += `<br><span style="color: #94a3b8; font-size: 12px;">Проігноровано файлів: ${ignoredCount}</span>`;
+    }
+
     outputDiv.innerHTML = resultHTML;
     
-    // Show download ZIP button once files are processed
-    downloadBtn.style.display = 'block';
+    // Показуємо кнопку завантаження, тільки якщо є файли після фільтрації
+    const hasFilesToDownload = Object.keys(organizedStructure).length > 0;
+    downloadBtn.style.display = hasFilesToDownload ? 'block' : 'none';
 }
 
 async function downloadZip() {
     const zip = new JSZip();
     
-    // Create folders and put files into them based on categorization
     for (const [folderName, fileList] of Object.entries(organizedStructure)) {
         const folder = zip.folder(folderName);
         fileList.forEach(fileName => {
-            // Add a placeholder text inside each generated file for demonstration
-            folder.file(fileName, `This is an automated placeholder for ${fileName}`);
+            folder.file(fileName, `Автоматично створений заповнювач для ${fileName}`);
         });
     }
 
-    // Generate the ZIP file and trigger download
     try {
         const content = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(content);
@@ -61,7 +80,7 @@ async function downloadZip() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     } catch (error) {
-        console.error('Error generating ZIP archive:', error);
-        alert('Failed to generate ZIP archive.');
+        console.error('Помилка генерації ZIP-архіву:', error);
+        alert('Не вдалося згенерувати ZIP-архів.');
     }
 }
