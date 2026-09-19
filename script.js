@@ -1,5 +1,6 @@
 let organizedStructure = {};
-let loadedFileContents = {}; // Для майбутнього збереження вмісту реальних файлів
+let loadedFileContents = {}; 
+let currentEditingFile = null;
 
 window.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
@@ -51,13 +52,11 @@ function toggleTheme() {
     }
 }
 
-// Обробка завантаження папки через системний діалог
 async function handleFolderSelect(event) {
     const files = event.target.files;
     processFileList(files);
 }
 
-// Обробка перетягування папок або файлів у зону Drag-and-Drop
 async function handleDroppedItems(items) {
     const filePaths = [];
     loadedFileContents = {};
@@ -81,8 +80,6 @@ async function traverseFileTree(item, path, filePaths) {
             item.file(async (file) => {
                 const fullPath = path ? `${path}/${file.name}` : file.name;
                 filePaths.push(fullPath);
-                
-                // Зберігаємо оригінальний бінарний/текстовий контент файлу
                 try {
                     const content = await file.text();
                     loadedFileContents[fullPath] = content;
@@ -111,11 +108,9 @@ function processFileList(files) {
     
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        // webkitRelativePath містить повний шлях у паці
         const path = file.webkitRelativePath || file.name;
         fileNames.push(path);
         
-        // Зберігаємо контент асинхронно у фоні
         file.text().then(content => {
             loadedFileContents[path] = content;
         }).catch(() => {
@@ -138,38 +133,37 @@ async function importFromGitHub() {
     const outputDiv = document.getElementById('output');
 
     if (!repoInput) {
-        alert('Будь ласка, введіть репозиторій у форматі owner/repo (наприклад, octocat/Spoon-Knife)');
+        alert('Please enter repository in owner/repo format');
         return;
     }
 
-    outputDiv.innerHTML = "⏳ Завантаження структури з GitHub...";
+    outputDiv.innerHTML = "⏳ Fetching repository structure from GitHub...";
 
     try {
         const repoClean = repoInput.replace('https://github.com/', '').replace(/\/$/, '');
         const response = await fetch(`https://api.github.com/repos/${repoClean}/git/trees/HEAD?recursive=1`);
         
         if (!response.ok) {
-            throw new Error('Репозиторій не знайдено або перевищено ліміт запитів API.');
+            throw new Error('Repository not found or rate limit exceeded.');
         }
 
         const data = await response.json();
-        
         const filePaths = data.tree
             .filter(item => item.type === 'blob')
             .map(item => item.path);
 
         if (filePaths.length === 0) {
-            outputDiv.innerHTML = "⚠️ У цьому репозиторії не знайдено файлів.";
+            outputDiv.innerHTML = "⚠️ No files found in this repository.";
             return;
         }
 
-        loadedFileContents = {}; // Очищаємо кеш для GitHub
+        loadedFileContents = {}; 
         document.getElementById('fileInput').value = filePaths.join(', ');
         organizeFiles();
         
     } catch (error) {
-        console.error('Помилка імпорту з GitHub:', error);
-        outputDiv.innerHTML = `❌ Помилка: ${error.message}`;
+        console.error('GitHub import error:', error);
+        outputDiv.innerHTML = `❌ Error: ${error.message}`;
     }
 }
 
@@ -209,7 +203,7 @@ function organizeFiles() {
     const statsPanel = document.getElementById('statsPanel');
     
     if (!input.trim()) {
-        outputDiv.innerHTML = "Будь ласка, виберіть папку, імпортуйте репозиторій або введіть імена файлів.";
+        outputDiv.innerHTML = "Please select a folder, import a repository, or enter filenames.";
         actionButtons.style.display = 'none';
         statsPanel.style.display = 'none';
         return;
@@ -230,7 +224,7 @@ function organizeFiles() {
         }
     });
 
-    let resultHTML = "<strong>Результати сортування:</strong><br>";
+    let resultHTML = "<strong>Sorting Results (click file to edit content):</strong><br>";
     organizedStructure = {};
     let ignoredCount = 0;
     let totalProcessedFiles = 0;
@@ -260,17 +254,18 @@ function organizeFiles() {
         organizedStructure[targetFolder].push(file);
         totalProcessedFiles++;
 
-        resultHTML += `➔ ${file} &nbsp;&nbsp;📂 [/${targetFolder}/]<br>`;
+        // Робимо файли клікабельними для відкриття редактора
+        resultHTML += `➔ <span onclick="openFileEditor('${file.replace(/'/g, "\\'")}')" style="color: #38bdf8; cursor: pointer; text-decoration: underline;" title="Клікніть щоб редагувати вміст">${file}</span> &nbsp;&nbsp;📂 [/${targetFolder}/]<br>`;
     });
 
     if (ignoredCount > 0) {
-        resultHTML += `<br><span style="color: var(--text-muted); font-size: 12px;">Проігноровано файлів: ${ignoredCount}</span>`;
+        resultHTML += `<br><span style="color: var(--text-muted); font-size: 12px;">Ignored files: ${ignoredCount}</span>`;
     }
 
     const totalCategories = Object.keys(organizedStructure).length;
     if (totalProcessedFiles > 0) {
         statsPanel.style.display = 'block';
-        statsPanel.innerHTML = `📊 <strong>Аналітика:</strong> Оброблено файлів: <b>${totalProcessedFiles}</b> | Створено папок: <b>${totalCategories}</b> | Проігноровано: <b>${ignoredCount}</b>`;
+        statsPanel.innerHTML = `📊 <strong>Analytics:</strong> Processed files: <b>${totalProcessedFiles}</b> | Created folders: <b>${totalCategories}</b> | Ignored: <b>${ignoredCount}</b>`;
     } else {
         statsPanel.style.display = 'none';
     }
@@ -281,8 +276,35 @@ function organizeFiles() {
     actionButtons.style.display = hasFilesToDownload ? 'flex' : 'none';
 }
 
+// Функції управління модальним редактором
+function openFileEditor(filePath) {
+    currentEditingFile = filePath;
+    document.getElementById('modalFileName').textContent = `Редагування: ${filePath}`;
+    
+    let content = loadedFileContents[filePath];
+    if (content === undefined || content === null) {
+        content = getFileTemplateContent(filePath);
+    }
+    
+    document.getElementById('modalFileContent').value = content;
+    document.getElementById('fileEditorModal').style.display = 'flex';
+}
+
+function closeFileEditor() {
+    document.getElementById('fileEditorModal').style.display = 'none';
+    currentEditingFile = null;
+}
+
+function saveFileContent() {
+    if (currentEditingFile) {
+        const newContent = document.getElementById('modalFileContent').value;
+        loadedFileContents[currentEditingFile] = newContent;
+        alert(`Зміни для файлу "${currentEditingFile}" успішно збережено в пам'яті сесії!`);
+    }
+    closeFileEditor();
+}
+
 function getFileTemplateContent(fileName) {
-    // Якщо для цього файлу вже є реальний завантажений контент з ПК — використовуємо його!
     if (loadedFileContents[fileName] !== undefined && loadedFileContents[fileName] !== null) {
         return loadedFileContents[fileName];
     }
@@ -325,8 +347,8 @@ async function downloadZip() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     } catch (error) {
-        console.error('Помилка генерації ZIP-архіву:', error);
-        alert('Не вдалося згенерувати ZIP-архів.');
+        console.error('ZIP generation error:', error);
+        alert('Failed to generate ZIP archive.');
     }
 }
 
@@ -345,9 +367,9 @@ function copyProjectTree() {
     treeText += "```";
 
     navigator.clipboard.writeText(treeText).then(() => {
-        alert('Схему проєкту скопійовано у форматі Markdown!');
+        alert('Project tree copied as Markdown!');
     }).catch(err => {
-        console.error('Помилка копіювання:', err);
-        alert('Не вдалося скопіювати схему.');
+        console.error('Copy error:', err);
+        alert('Failed to copy tree.');
     });
 }
