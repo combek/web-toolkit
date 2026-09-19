@@ -19,6 +19,14 @@
             <section class="card">
                 <h2>📁 Організатор структури файлів</h2>
                 
+                <!-- Кнопки швидких пресетів -->
+                <p>Швидкі пресети проєктів:</p>
+                <div class="presets" style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button type="button" onclick="loadPreset('python')" style="background-color: #334155; font-size: 12px; padding: 6px 10px; width: auto;">🐍 Python Stack</button>
+                    <button type="button" onclick="loadPreset('web')" style="background-color: #334155; font-size: 12px; padding: 6px 10px; width: auto;">🌐 Web / React</button>
+                    <button type="button" onclick="loadPreset('data')" style="background-color: #334155; font-size: 12px; padding: 6px 10px; width: auto;">📊 Data Science</button>
+                </div>
+
                 <p>Введіть імена файлів, розділені комами:</p>
                 <input type="text" id="fileInput" placeholder="документ.pdf, фото.png, скрипт.py, архів.zip">
 
