@@ -123,7 +123,6 @@ function organizeFiles() {
     const files = input.split(',').map(f => f.trim()).filter(f => f.length > 0);
     const ignorePatterns = ignoreInput.split(',').map(p => p.trim()).filter(p => p.length > 0);
 
-    // Парсинг кастомних правил (наприклад, "md: docs, json: config")
     const customRules = {};
     customRulesInput.split(',').forEach(rule => {
         const parts = rule.split(':');
@@ -157,8 +156,6 @@ function organizeFiles() {
 
         const parts = file.split('.');
         const ext = parts.length > 1 ? parts.pop().toUpperCase() : 'NO_EXTENSION';
-        
-        // Визначаємо цільову папку: беремо з кастомних правил або стандартну за розширенням
         const targetFolder = customRules[ext] || ext;
 
         if (!organizedStructure[targetFolder]) {
@@ -188,13 +185,44 @@ function organizeFiles() {
     actionButtons.style.display = hasFilesToDownload ? 'flex' : 'none';
 }
 
+// Генератор розумних шаблонів контенту залежно від імені файлу
+function getFileTemplateContent(fileName) {
+    const lowerName = fileName.toLowerCase();
+    
+    if (lowerName === 'readme.md') {
+        return `# Project Overview\n\nGenerated automatically via Microservice Automation Tool.\n\n## Getting Started\n1. Install dependencies\n2. Run the application`;
+    }
+    if (lowerName === 'package.json') {
+        return `{\n  "name": "generated-project",\n  "version": "1.0.0",\n  "description": "Scaffolded project structure",\n  "main": "index.js",\n  "scripts": {\n    "start": "node index.js"\n  },\n  "dependencies": {}\n}`;
+    }
+    if (lowerName === 'requirements.txt') {
+        return `# Python dependencies\nrequests>=2.31.0\npandas>=2.0.0\npython-dotenv>=1.0.0`;
+    }
+    if (lowerName === '.gitignore') {
+        return `node_modules/\nvenv/\n__pycache__/\n.env\n.DS_Store`;
+    }
+    if (lowerName.endsWith('.html')) {
+        return `<!DOCTYPE html>\n<html lang="uk">\n<head>\n    <meta charset="UTF-8">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello World</h1>\n</body>\n</html>`;
+    }
+    if (lowerName.endsWith('.py')) {
+        return `# -*- coding: utf-8 -*-\n\ndef main():\n    print("Microservice is running...")\n\nif __name__ == "__main__":\n    main()`;
+    }
+    if (lowerName.endsWith('.css')) {
+        return `body {\n    font-family: Arial, sans-serif;\n    background-color: #0f172a;\n    color: #f8fafc;\n    margin: 0;\n    padding: 20px;\n}`;
+    }
+    
+    // Універсальний дефолтний контент для інших файлів
+    return `Автоматично згенерований шаблон для файлу: ${fileName}`;
+}
+
 async function downloadZip() {
     const zip = new JSZip();
     
     for (const [folderName, fileList] of Object.entries(organizedStructure)) {
         const folder = zip.folder(folderName);
         fileList.forEach(fileName => {
-            folder.file(fileName, `Автоматично створений заповнювач для ${fileName}`);
+            const templateContent = getFileTemplateContent(fileName);
+            folder.file(fileName, templateContent);
         });
     }
 
@@ -203,7 +231,7 @@ async function downloadZip() {
         const url = URL.createObjectURL(content);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'structured-files.zip';
+        a.download = 'scaffolded-project.zip';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
