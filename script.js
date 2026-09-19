@@ -28,7 +28,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }, false);
 });
 
-// Функція імпорту структури з GitHub API
 async function importFromGitHub() {
     const repoInput = document.getElementById('githubRepoInput').value.trim();
     const outputDiv = document.getElementById('output');
@@ -41,7 +40,6 @@ async function importFromGitHub() {
     outputDiv.innerHTML = "⏳ Завантаження структури з GitHub...";
 
     try {
-        // Використовуємо публічне GitHub API для отримання дерева репозиторію (гілка за замовчуванням)
         const repoClean = repoInput.replace('https://github.com/', '').replace(/\/$/, '');
         const response = await fetch(`https://api.github.com/repos/${repoClean}/git/trees/HEAD?recursive=1`);
         
@@ -51,7 +49,6 @@ async function importFromGitHub() {
 
         const data = await response.json();
         
-        // Фільтруємо лише файли (не папки) та беремо їх шляхи
         const filePaths = data.tree
             .filter(item => item.type === 'blob')
             .map(item => item.path);
@@ -61,7 +58,6 @@ async function importFromGitHub() {
             return;
         }
 
-        // Записуємо отримані файли у поле введення та запускаємо сортування
         document.getElementById('fileInput').value = filePaths.join(', ');
         organizeFiles();
         
@@ -90,16 +86,20 @@ function processManualInput() {
 function loadPreset(type) {
     const fileInput = document.getElementById('fileInput');
     const ignoreInput = document.getElementById('ignoreInput');
+    const customRulesInput = document.getElementById('customRulesInput');
 
     if (type === 'python') {
         fileInput.value = "main.py, utils.py, requirements.txt, README.md, .env, test_script.py";
         ignoreInput.value = ".env, __pycache__, venv";
+        customRulesInput.value = "md: docs, txt: docs";
     } else if (type === 'web') {
         fileInput.value = "index.html, style.css, script.js, package.json, logo.png, hero.jpg";
         ignoreInput.value = "node_modules, .DS_Store";
+        customRulesInput.value = "html: public, css: assets/css, js: assets/js";
     } else if (type === 'data') {
         fileInput.value = "analysis.ipynb, dataset.csv, report.pdf, config.json, output.png";
         ignoreInput.value = "*.tmp, .ipynb_checkpoints";
+        customRulesInput.value = "csv: data, ipynb: notebooks";
     }
     
     organizeFiles();
@@ -108,6 +108,7 @@ function loadPreset(type) {
 function organizeFiles() {
     const input = document.getElementById('fileInput').value;
     const ignoreInput = document.getElementById('ignoreInput').value;
+    const customRulesInput = document.getElementById('customRulesInput').value;
     const outputDiv = document.getElementById('output');
     const actionButtons = document.getElementById('actionButtons');
     const statsPanel = document.getElementById('statsPanel');
@@ -121,6 +122,19 @@ function organizeFiles() {
 
     const files = input.split(',').map(f => f.trim()).filter(f => f.length > 0);
     const ignorePatterns = ignoreInput.split(',').map(p => p.trim()).filter(p => p.length > 0);
+
+    // Парсинг кастомних правил (наприклад, "md: docs, json: config")
+    const customRules = {};
+    customRulesInput.split(',').forEach(rule => {
+        const parts = rule.split(':');
+        if (parts.length === 2) {
+            const ext = parts[0].trim().toUpperCase();
+            const folder = parts[1].trim().toUpperCase();
+            if (ext && folder) {
+                customRules[ext] = folder;
+            }
+        }
+    });
 
     let resultHTML = "<strong>Результати сортування:</strong><br>";
     organizedStructure = {};
@@ -144,13 +158,16 @@ function organizeFiles() {
         const parts = file.split('.');
         const ext = parts.length > 1 ? parts.pop().toUpperCase() : 'NO_EXTENSION';
         
-        if (!organizedStructure[ext]) {
-            organizedStructure[ext] = [];
+        // Визначаємо цільову папку: беремо з кастомних правил або стандартну за розширенням
+        const targetFolder = customRules[ext] || ext;
+
+        if (!organizedStructure[targetFolder]) {
+            organizedStructure[targetFolder] = [];
         }
-        organizedStructure[ext].push(file);
+        organizedStructure[targetFolder].push(file);
         totalProcessedFiles++;
 
-        resultHTML += `➔ ${file} &nbsp;&nbsp;📂 [/${ext}/]<br>`;
+        resultHTML += `➔ ${file} &nbsp;&nbsp;📂 [/${targetFolder}/]<br>`;
     });
 
     if (ignoredCount > 0) {
