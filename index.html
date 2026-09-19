@@ -61,9 +61,10 @@
                 <div id="output" class="output"></div>
                 
                 <div id="actionButtons" style="display: none; margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1; min-width: 200px;">Download ZIP archive</button>
-                    <button id="exportCliBtn" onclick="exportPythonCli()" style="background-color: #10b981; color: white; flex: 1; min-width: 200px;">📥 Згенерувати Python CLI</button>
-                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1; min-width: 200px;">Copy Tree (Markdown)</button>
+                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1; min-width: 180px;">Download ZIP archive</button>
+                    <button id="exportCliBtn" onclick="exportPythonCli()" style="background-color: #10b981; color: white; flex: 1; min-width: 180px;">📥 Python CLI</button>
+                    <button id="sharePresetBtn" onclick="sharePresetUrl()" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 180px;">🔗 Поділитися лінком</button>
+                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1; min-width: 180px;">Copy Tree</button>
                 </div>
             </section>
         </main>
