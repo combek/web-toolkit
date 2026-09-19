@@ -19,6 +19,13 @@
             <section class="card">
                 <h2>📁 Організатор структури файлів</h2>
                 
+                <!-- Інтеграція з GitHub API -->
+                <p>Імпорт з публічного GitHub-репозиторію:</p>
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="text" id="githubRepoInput" placeholder="owner/repo (наприклад: torvalds/linux)" style="margin-bottom: 0; flex: 1;">
+                    <button type="button" onclick="importFromGitHub()" style="background-color: #0284c7; width: auto; padding: 10px 16px;">Імпортувати</button>
+                </div>
+
                 <!-- Кнопки швидких пресетів -->
                 <p>Швидкі пресети проєктів:</p>
                 <div class="presets" style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
