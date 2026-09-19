@@ -13,7 +13,7 @@
         <header style="display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h1>Інструментарій Python та веб-автоматизації</h1>
-                <p>Утиліта для мікросервісів автоматизації виробничого рівня та організації файлів.</p>
+                <p>Нішевий сервіс для міграції, рефакторингу та організації файлових структур.</p>
             </div>
             <button type="button" onclick="toggleTheme()" id="themeToggleBtn" style="background: var(--border-color); color: var(--text-color); border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 16px; width: auto;" title="Змінити тему">☀️</button>
         </header>
@@ -22,11 +22,18 @@
             <section class="card">
                 <h2>📁 Організатор структури файлів</h2>
                 
+                <!-- Завантаження реальної папки з ПК -->
+                <p>Виберіть або перетягніть реальну папку з проєкту:</p>
+                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                    <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
+                    <button type="button" onclick="document.getElementById('folderInput').click()" style="background-color: #0284c7; flex: 1;">📂 Вибрати папку на диску</button>
+                </div>
+
                 <!-- Інтеграція з GitHub API -->
-                <p>Імпорт з публічного GitHub-репозиторію:</p>
+                <p>Або імпорт з публічного GitHub-репозиторію:</p>
                 <div style="display: flex; gap: 8px; margin-bottom: 15px;">
                     <input type="text" id="githubRepoInput" placeholder="owner/repo (наприклад: torvalds/linux)" style="margin-bottom: 0; flex: 1;">
-                    <button type="button" onclick="importFromGitHub()" style="background-color: #0284c7; width: auto; padding: 10px 16px;">Імпортувати</button>
+                    <button type="button" onclick="importFromGitHub()" style="background-color: #334155; width: auto; padding: 10px 16px;">Імпортувати</button>
                 </div>
 
                 <!-- Кнопки швидких пресетів -->
@@ -39,7 +46,7 @@
 
                 <!-- Зона Drag-and-Drop -->
                 <div id="dropZone" style="border: 2px dashed var(--border-color); padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 15px; background: var(--input-bg); color: var(--text-muted); transition: 0.2s;">
-                    Перетягніть файли сюди або введіть їх вручну нижче
+                    Перетягніть сюди папку або файли, або введіть їх вручну нижче
                 </div>
 
                 <p>Введіть імена файлів, розділені комами:</p>
@@ -60,7 +67,7 @@
                 <div id="output" class="output"></div>
                 
                 <div id="actionButtons" style="display: none; margin-top: 15px; display: flex; gap: 10px;">
-                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1;">Завантажити ZIP-архів (з шаблонами)</button>
+                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1;">Завантажити ZIP-архів</button>
                     <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1;">Скопіювати схему (Markdown)</button>
                 </div>
             </section>
