@@ -11,6 +11,22 @@ window.addEventListener('DOMContentLoaded', () => {
         if (themeBtn) themeBtn.textContent = '🌙';
     }
 
+    // Автоматичне завантаження параметрів з URL (якщо передано лінк-пресет)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('files')) {
+        document.getElementById('fileInput').value = decodeURIComponent(urlParams.get('files'));
+    }
+    if (urlParams.has('ignore')) {
+        document.getElementById('ignoreInput').value = decodeURIComponent(urlParams.get('ignore'));
+    }
+    if (urlParams.has('rules')) {
+        document.getElementById('customRulesInput').value = decodeURIComponent(urlParams.get('rules'));
+    }
+    
+    if (urlParams.has('files') || urlParams.has('rules') || urlParams.has('ignore')) {
+        organizeFiles();
+    }
+
     const dropZone = document.getElementById('dropZone');
 
     ['dragenter', 'dragover'].forEach(eventName => {
@@ -350,7 +366,6 @@ async function downloadZip() {
     }
 }
 
-// Генерація та завантаження Python CLI скрипта на основі поточних правил
 function exportPythonCli() {
     const ignoreInput = document.getElementById('ignoreInput').value;
     const customRulesInput = document.getElementById('customRulesInput').value;
@@ -369,7 +384,6 @@ function exportPythonCli() {
         }
     });
 
-    // Формуємо Python скрипт
     const pythonScriptCode = `# -*- coding: utf-8 -*-
 import os
 import shutil
@@ -389,7 +403,6 @@ def organize_directory(target_dir="."):
         if os.path.isdir(item_path):
             continue
             
-        # Визначаємо розширення
         ext = item.split('.')[-1].upper() if '.' in item else "NO_EXTENSION"
         target_folder = CUSTOM_RULES.get(ext, ext)
         
@@ -418,6 +431,25 @@ if __name__ == "__main__":
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+
+// Генерація та копіювання посилання-пресету в буфер обміну
+function sharePresetUrl() {
+    const files = document.getElementById('fileInput').value.trim();
+    const ignore = document.getElementById('ignoreInput').value.trim();
+    const rules = document.getElementById('customRulesInput').value.trim();
+
+    const url = new URL(window.location.origin + window.location.pathname);
+    if (files) url.searchParams.set('files', files);
+    if (ignore) url.searchParams.set('ignore', ignore);
+    if (rules) url.searchParams.set('rules', rules);
+
+    navigator.clipboard.writeText(url.toString()).then(() => {
+        alert('🔗 Посилання з пресетом успішно скопійовано в буфер обміну!');
+    }).catch(err => {
+        console.error('Помилка копіювання лінку:', err);
+        prompt('Скопіюйте це посилання вручну:', url.toString());
+    });
 }
 
 function copyProjectTree() {
