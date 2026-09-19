@@ -1,31 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Automation Toolkit | Professional SaaS Platform</title>
+    <title>Інструментарій Python та веб-автоматизації</title>
     <link rel="stylesheet" href="style.css">
-    <!-- JSZip Library for client-side archive generation -->
+    <!-- Бібліотека JSZip для генерації архівів на клієнті -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Python & Web Automation Toolkit</h1>
-            <p>Production-grade automation microservices and file organization utility.</p>
+            <h1>Інструментарій Python та веб-автоматизації</h1>
+            <p>Утиліта для мікросервісів автоматизації виробничого рівня та організації файлів.</p>
         </header>
 
         <main>
             <section class="card">
-                <h2>📁 File Structure Organizer</h2>
-                <p>Enter file names separated by commas to sort and structure them automatically.</p>
-                <input type="text" id="fileInput" placeholder="document.pdf, photo.png, script.py, archive.zip">
-                <button onclick="organizeFiles()">Sort Files</button>
+                <h2>📁 Організатор структури файлів</h2>
+                
+                <p>Введіть імена файлів, розділені комами:</p>
+                <input type="text" id="fileInput" placeholder="документ.pdf, фото.png, скрипт.py, архів.zip">
+
+                <p>Ігнорувати файли/маски (через кому):</p>
+                <input type="text" id="ignoreInput" placeholder=".env, node_modules, temp.*">
+
+                <button onclick="organizeFiles()">Сортувати файли</button>
                 
                 <div id="output" class="output"></div>
                 
-                <!-- New Download ZIP Button -->
-                <button id="downloadZipBtn" onclick="downloadZip()" style="display: none; margin-top: 15px; background-color: #2ea44f; color: white;">Download ZIP Archive</button>
+                <button id="downloadZipBtn" onclick="downloadZip()" style="display: none; margin-top: 15px; background-color: #0284c7; color: white;">Завантажити ZIP-архів</button>
             </section>
         </main>
     </div>
