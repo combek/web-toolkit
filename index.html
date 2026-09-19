@@ -1,25 +1,31 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Automation Toolkit | Portfolio Preview</title>
+    <title>Web Automation Toolkit | Professional SaaS Platform</title>
     <link rel="stylesheet" href="style.css">
+    <!-- JSZip Library for client-side archive generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Python & Web Automation Toolkit</h1>
-            <p>Демонстрація мікросервісів та інструментів автоматизації для портфоліо.</p>
+            <p>Production-grade automation microservices and file organization utility.</p>
         </header>
 
         <main>
             <section class="card">
-                <h2>📁 Генератор структури / Організайзер файлів</h2>
-                <p>Введіть список файлів через кому, щоб побачити, як алгоритм сортує їх за типами.</p>
+                <h2>📁 File Structure Organizer</h2>
+                <p>Enter file names separated by commas to sort and structure them automatically.</p>
                 <input type="text" id="fileInput" placeholder="document.pdf, photo.png, script.py, archive.zip">
-                <button onclick="organizeFiles()">Сортувати</button>
+                <button onclick="organizeFiles()">Sort Files</button>
+                
                 <div id="output" class="output"></div>
+                
+                <!-- New Download ZIP Button -->
+                <button id="downloadZipBtn" onclick="downloadZip()" style="display: none; margin-top: 15px; background-color: #2ea44f; color: white;">Download ZIP Archive</button>
             </section>
         </main>
     </div>
