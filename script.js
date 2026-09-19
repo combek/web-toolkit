@@ -1,6 +1,15 @@
 let organizedStructure = {};
 
 window.addEventListener('DOMContentLoaded', () => {
+    // Ініціалізація теми з localStorage
+    const savedTheme = localStorage.getItem('theme');
+    const themeBtn = document.getElementById('themeToggleBtn');
+    
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+        if (themeBtn) themeBtn.textContent = '🌙';
+    }
+
     const dropZone = document.getElementById('dropZone');
 
     ['dragenter', 'dragover'].forEach(eventName => {
@@ -8,7 +17,6 @@ window.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             e.stopPropagation();
             dropZone.style.borderColor = '#0284c7';
-            dropZone.style.background = '#1e293b';
         }, false);
     });
 
@@ -16,8 +24,7 @@ window.addEventListener('DOMContentLoaded', () => {
         dropZone.addEventListener(eventName, (e) => {
             e.preventDefault();
             e.stopPropagation();
-            dropZone.style.borderColor = '#334155';
-            dropZone.style.background = '#0f172a';
+            dropZone.style.borderColor = 'var(--border-color)';
         }, false);
     });
 
@@ -27,6 +34,18 @@ window.addEventListener('DOMContentLoaded', () => {
         handleDroppedFiles(files);
     }, false);
 });
+
+// Функція перемикання тем
+function toggleTheme() {
+    document.body.classList.toggle('light-theme');
+    const isLight = document.body.classList.contains('light-theme');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    
+    const themeBtn = document.getElementById('themeToggleBtn');
+    if (themeBtn) {
+        themeBtn.textContent = isLight ? '🌙' : '☀️';
+    }
+}
 
 async function importFromGitHub() {
     const repoInput = document.getElementById('githubRepoInput').value.trim();
@@ -168,7 +187,7 @@ function organizeFiles() {
     });
 
     if (ignoredCount > 0) {
-        resultHTML += `<br><span style="color: #94a3b8; font-size: 12px;">Проігноровано файлів: ${ignoredCount}</span>`;
+        resultHTML += `<br><span style="color: var(--text-muted); font-size: 12px;">Проігноровано файлів: ${ignoredCount}</span>`;
     }
 
     const totalCategories = Object.keys(organizedStructure).length;
@@ -185,7 +204,6 @@ function organizeFiles() {
     actionButtons.style.display = hasFilesToDownload ? 'flex' : 'none';
 }
 
-// Генератор розумних шаблонів контенту залежно від імені файлу
 function getFileTemplateContent(fileName) {
     const lowerName = fileName.toLowerCase();
     
@@ -211,7 +229,6 @@ function getFileTemplateContent(fileName) {
         return `body {\n    font-family: Arial, sans-serif;\n    background-color: #0f172a;\n    color: #f8fafc;\n    margin: 0;\n    padding: 20px;\n}`;
     }
     
-    // Універсальний дефолтний контент для інших файлів
     return `Автоматично згенерований шаблон для файлу: ${fileName}`;
 }
 
