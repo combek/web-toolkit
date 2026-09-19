@@ -1,6 +1,50 @@
 let organizedStructure = {};
 
-// Функція завантаження пресетів
+// Ініціалізація подій Drag-and-Drop після завантаження сторінки
+window.addEventListener('DOMContentLoaded', () => {
+    const dropZone = document.getElementById('dropZone');
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = '#0284c7';
+            dropZone.style.background = '#1e293b';
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = '#334155';
+            dropZone.style.background = '#0f172a';
+        }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleDroppedFiles(files);
+    }, false);
+});
+
+function handleDroppedFiles(files) {
+    const fileNames = [];
+    for (let i = 0; i < files.length; i++) {
+        fileNames.push(files[i].name);
+    }
+    
+    if (fileNames.length > 0) {
+        document.getElementById('fileInput').value = fileNames.join(', ');
+        organizeFiles();
+    }
+}
+
+function processManualInput() {
+    organizeFiles();
+}
+
 function loadPreset(type) {
     const fileInput = document.getElementById('fileInput');
     const ignoreInput = document.getElementById('ignoreInput');
@@ -16,7 +60,6 @@ function loadPreset(type) {
         ignoreInput.value = "*.tmp, .ipynb_checkpoints";
     }
     
-    // Автоматично запускаємо сортування при виборі пресету
     organizeFiles();
 }
 
@@ -27,7 +70,7 @@ function organizeFiles() {
     const actionButtons = document.getElementById('actionButtons');
     
     if (!input.trim()) {
-        outputDiv.innerHTML = "Будь ласка, введіть хоча б одне ім'я файлу.";
+        outputDiv.innerHTML = "Будь ласка, введіть хоча б одне ім'я файлу або перетягніть їх у зону вище.";
         actionButtons.style.display = 'none';
         return;
     }
