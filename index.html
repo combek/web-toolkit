@@ -10,9 +10,12 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Інструментарій Python та веб-автоматизації</h1>
-            <p>Утиліта для мікросервісів автоматизації виробничого рівня та організації файлів.</p>
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Інструментарій Python та веб-автоматизації</h1>
+                <p>Утиліта для мікросервісів автоматизації виробничого рівня та організації файлів.</p>
+            </div>
+            <button type="button" onclick="toggleTheme()" id="themeToggleBtn" style="background: var(--border-color); color: var(--text-color); border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 16px; width: auto;" title="Змінити тему">☀️</button>
         </header>
 
         <main>
@@ -35,7 +38,7 @@
                 </div>
 
                 <!-- Зона Drag-and-Drop -->
-                <div id="dropZone" style="border: 2px dashed #334155; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 15px; background: #0f172a; color: #94a3b8; transition: 0.2s;">
+                <div id="dropZone" style="border: 2px dashed var(--border-color); padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 15px; background: var(--input-bg); color: var(--text-muted); transition: 0.2s;">
                     Перетягніть файли сюди або введіть їх вручну нижче
                 </div>
 
@@ -52,13 +55,13 @@
                 <button onclick="organizeFiles()">Сортувати файли</button>
                 
                 <!-- Блок статистики -->
-                <div id="statsPanel" style="display: none; margin-top: 15px; padding: 10px; background: #1e293b; border-radius: 6px; font-size: 13px; color: #38bdf8; border: 1px solid #334155;"></div>
+                <div id="statsPanel" style="display: none; margin-top: 15px; padding: 10px; background: var(--input-bg); border-radius: 6px; font-size: 13px; color: #38bdf8; border: 1px solid var(--border-color);"></div>
 
                 <div id="output" class="output"></div>
                 
                 <div id="actionButtons" style="display: none; margin-top: 15px; display: flex; gap: 10px;">
                     <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1;">Завантажити ZIP-архів (з шаблонами)</button>
-                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: #334155; color: white; flex: 1;">Скопіювати схему (Markdown)</button>
+                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1;">Скопіювати схему (Markdown)</button>
                 </div>
             </section>
         </main>
