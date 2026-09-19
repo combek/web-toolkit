@@ -1,6 +1,5 @@
 let organizedStructure = {};
 
-// Ініціалізація подій Drag-and-Drop після завантаження сторінки
 window.addEventListener('DOMContentLoaded', () => {
     const dropZone = document.getElementById('dropZone');
 
@@ -68,10 +67,12 @@ function organizeFiles() {
     const ignoreInput = document.getElementById('ignoreInput').value;
     const outputDiv = document.getElementById('output');
     const actionButtons = document.getElementById('actionButtons');
+    const statsPanel = document.getElementById('statsPanel');
     
     if (!input.trim()) {
         outputDiv.innerHTML = "Будь ласка, введіть хоча б одне ім'я файлу або перетягніть їх у зону вище.";
         actionButtons.style.display = 'none';
+        statsPanel.style.display = 'none';
         return;
     }
 
@@ -81,6 +82,7 @@ function organizeFiles() {
     let resultHTML = "<strong>Результати сортування:</strong><br>";
     organizedStructure = {};
     let ignoredCount = 0;
+    let totalProcessedFiles = 0;
 
     files.forEach(file => {
         const isIgnored = ignorePatterns.some(pattern => {
@@ -103,6 +105,7 @@ function organizeFiles() {
             organizedStructure[ext] = [];
         }
         organizedStructure[ext].push(file);
+        totalProcessedFiles++;
 
         resultHTML += `➔ ${file} &nbsp;&nbsp;📂 [/${ext}/]<br>`;
     });
@@ -111,9 +114,18 @@ function organizeFiles() {
         resultHTML += `<br><span style="color: #94a3b8; font-size: 12px;">Проігноровано файлів: ${ignoredCount}</span>`;
     }
 
+    // Відображення панелі статистики
+    const totalCategories = Object.keys(organizedStructure).length;
+    if (totalProcessedFiles > 0) {
+        statsPanel.style.display = 'block';
+        statsPanel.innerHTML = `📊 <strong>Аналітика:</strong> Оброблено файлів: <b>${totalProcessedFiles}</b> | Створено папок: <b>${totalCategories}</b> | Проігноровано: <b>${ignoredCount}</b>`;
+    } else {
+        statsPanel.style.display = 'none';
+    }
+
     outputDiv.innerHTML = resultHTML;
     
-    const hasFilesToDownload = Object.keys(organizedStructure).length > 0;
+    const hasFilesToDownload = totalProcessedFiles > 0;
     actionButtons.style.display = hasFilesToDownload ? 'flex' : 'none';
 }
 
