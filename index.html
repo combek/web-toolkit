@@ -12,67 +12,75 @@
     <div class="container">
         <header style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h1>Інструментарій Python та веб-автоматизації</h1>
-                <p>Нішевий сервіс для міграції, рефакторингу та організації файлових структур.</p>
+                <h1>Python and web automation tools</h1>
+                <p>Niche service for migration, refactoring, and file structure organization.</p>
             </div>
             <button type="button" onclick="toggleTheme()" id="themeToggleBtn" style="background: var(--border-color); color: var(--text-color); border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 16px; width: auto;" title="Змінити тему">☀️</button>
         </header>
 
         <main>
             <section class="card">
-                <h2>📁 Організатор структури файлів</h2>
+                <h2>📁 File structure organizer</h2>
                 
-                <!-- Завантаження реальної папки з ПК -->
-                <p>Виберіть або перетягніть реальну папку з проєкту:</p>
+                <p>Select or drag the actual folder from the project:</p>
                 <div style="display: flex; gap: 8px; margin-bottom: 15px;">
                     <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
-                    <button type="button" onclick="document.getElementById('folderInput').click()" style="background-color: #0284c7; flex: 1;">📂 Вибрати папку на диску</button>
+                    <button type="button" onclick="document.getElementById('folderInput').click()" style="background-color: #0284c7; flex: 1;">📂 Select a folder on the disk</button>
                 </div>
 
-                <!-- Інтеграція з GitHub API -->
-                <p>Або імпорт з публічного GitHub-репозиторію:</p>
+                <p>Or import from a public GitHub repository:</p>
                 <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                    <input type="text" id="githubRepoInput" placeholder="owner/repo (наприклад: torvalds/linux)" style="margin-bottom: 0; flex: 1;">
-                    <button type="button" onclick="importFromGitHub()" style="background-color: #334155; width: auto; padding: 10px 16px;">Імпортувати</button>
+                    <input type="text" id="githubRepoInput" placeholder="owner/repo (for example: torvalds/linux)" style="margin-bottom: 0; flex: 1;">
+                    <button type="button" onclick="importFromGitHub()" style="background-color: #334155; width: auto; padding: 10px 16px;">Import</button>
                 </div>
 
-                <!-- Кнопки швидких пресетів -->
-                <p>Швидкі пресети проєктів:</p>
+                <p>Quick project presets:</p>
                 <div class="presets" style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
                     <button type="button" onclick="loadPreset('python')" style="background-color: #334155; font-size: 12px; padding: 6px 10px; width: auto;">🐍 Python Stack</button>
                     <button type="button" onclick="loadPreset('web')" style="background-color: #334155; font-size: 12px; padding: 6px 10px; width: auto;">🌐 Web / React</button>
                     <button type="button" onclick="loadPreset('data')" style="background-color: #334155; font-size: 12px; padding: 6px 10px; width: auto;">📊 Data Science</button>
                 </div>
 
-                <!-- Зона Drag-and-Drop -->
                 <div id="dropZone" style="border: 2px dashed var(--border-color); padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 15px; background: var(--input-bg); color: var(--text-muted); transition: 0.2s;">
-                    Перетягніть сюди папку або файли, або введіть їх вручну нижче
+                    Drag a folder or files here, or enter them manually below
                 </div>
 
-                <p>Введіть імена файлів, розділені комами:</p>
-                <input type="text" id="fileInput" placeholder="документ.pdf, фото.png, скрипт.py, архів.zip" oninput="processManualInput()">
+                <p>Enter the filenames separated by commas:</p>
+                <input type="text" id="fileInput" placeholder="document.pdf, photo.png, script.py, archive.zip" oninput="processManualInput()">
 
-                <p>Ігнорувати файли/маски (через кому):</p>
+                <p>Ignore files/masks (comma separated):</p>
                 <input type="text" id="ignoreInput" placeholder=".env, node_modules, temp.*" oninput="organizeFiles()">
 
-                <!-- Кастомні правила мапінгу -->
-                <p>Кастомні правила (розширення:папка через кому):</p>
+                <p>Custom rules (ext:folder comma separated):</p>
                 <input type="text" id="customRulesInput" placeholder="md: docs, json: config" oninput="organizeFiles()">
 
-                <button onclick="organizeFiles()">Сортувати файли</button>
+                <button onclick="organizeFiles()">Sort files</button>
                 
-                <!-- Блок статистики -->
                 <div id="statsPanel" style="display: none; margin-top: 15px; padding: 10px; background: var(--input-bg); border-radius: 6px; font-size: 13px; color: #38bdf8; border: 1px solid var(--border-color);"></div>
 
                 <div id="output" class="output"></div>
                 
                 <div id="actionButtons" style="display: none; margin-top: 15px; display: flex; gap: 10px;">
-                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1;">Завантажити ZIP-архів</button>
-                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1;">Скопіювати схему (Markdown)</button>
+                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1;">Download ZIP archive</button>
+                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1;">Copy Tree (Markdown)</button>
                 </div>
             </section>
         </main>
     </div>
+
+    <!-- Модальне вікно Live-редактора файлів -->
+    <div id="fileEditorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); width: 90%; max-width: 600px; padding: 20px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
+            <h3 id="modalFileName" style="margin-top: 0; color: var(--text-color);">Редагування файлу</h3>
+            <p style="font-size: 12px; color: var(--text-muted);">Змініть вміст файлу перед додаванням до фінального архіву:</p>
+            <textarea id="modalFileContent" style="width: 100%; height: 200px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-family: monospace; font-size: 13px; box-sizing: border-box; resize: vertical;"></textarea>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button type="button" onclick="saveFileContent()" style="background-color: #0284c7; flex: 1;">Зберегти зміни</button>
+                <button type="button" onclick="closeFileEditor()" style="background-color: #334155; flex: 1;">Скасувати</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
