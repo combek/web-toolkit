@@ -1,7 +1,7 @@
 let organizedStructure = {};
+let loadedFileContents = {}; // Для майбутнього збереження вмісту реальних файлів
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Ініціалізація теми з localStorage
     const savedTheme = localStorage.getItem('theme');
     const themeBtn = document.getElementById('themeToggleBtn');
     
@@ -29,13 +29,17 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     dropZone.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        handleDroppedFiles(files);
+        e.preventDefault();
+        e.stopPropagation();
+        const items = e.dataTransfer.items;
+        if (items && items.length > 0) {
+            handleDroppedItems(items);
+        } else {
+            handleDroppedFiles(e.dataTransfer.files);
+        }
     }, false);
 });
 
-// Функція перемикання тем
 function toggleTheme() {
     document.body.classList.toggle('light-theme');
     const isLight = document.body.classList.contains('light-theme');
@@ -45,6 +49,88 @@ function toggleTheme() {
     if (themeBtn) {
         themeBtn.textContent = isLight ? '🌙' : '☀️';
     }
+}
+
+// Обробка завантаження папки через системний діалог
+async function handleFolderSelect(event) {
+    const files = event.target.files;
+    processFileList(files);
+}
+
+// Обробка перетягування папок або файлів у зону Drag-and-Drop
+async function handleDroppedItems(items) {
+    const filePaths = [];
+    loadedFileContents = {};
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i].webkitGetAsEntry();
+        if (item) {
+            await traverseFileTree(item, '', filePaths);
+        }
+    }
+
+    if (filePaths.length > 0) {
+        document.getElementById('fileInput').value = filePaths.join(', ');
+        organizeFiles();
+    }
+}
+
+async function traverseFileTree(item, path, filePaths) {
+    if (item.isFile) {
+        await new Promise((resolve) => {
+            item.file(async (file) => {
+                const fullPath = path ? `${path}/${file.name}` : file.name;
+                filePaths.push(fullPath);
+                
+                // Зберігаємо оригінальний бінарний/текстовий контент файлу
+                try {
+                    const content = await file.text();
+                    loadedFileContents[fullPath] = content;
+                } catch (e) {
+                    loadedFileContents[fullPath] = null;
+                }
+                resolve();
+            });
+        });
+    } else if (item.isDirectory) {
+        const dirReader = item.createReader();
+        await new Promise((resolve) => {
+            dirReader.readEntries(async (entries) => {
+                for (let i = 0; i < entries.length; i++) {
+                    await traverseFileTree(entries[i], path ? `${path}/${item.name}` : item.name, filePaths);
+                }
+                resolve();
+            });
+        });
+    }
+}
+
+function processFileList(files) {
+    const fileNames = [];
+    loadedFileContents = {};
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        // webkitRelativePath містить повний шлях у паці
+        const path = file.webkitRelativePath || file.name;
+        fileNames.push(path);
+        
+        // Зберігаємо контент асинхронно у фоні
+        file.text().then(content => {
+            loadedFileContents[path] = content;
+        }).catch(() => {
+            loadedFileContents[path] = null;
+        });
+    }
+    
+    if (fileNames.length > 0) {
+        document.getElementById('fileInput').value = fileNames.join(', ');
+        organizeFiles();
+    }
+}
+
+function handleDroppedFiles(files) {
+    processFileList(files);
 }
 
 async function importFromGitHub() {
@@ -77,24 +163,13 @@ async function importFromGitHub() {
             return;
         }
 
+        loadedFileContents = {}; // Очищаємо кеш для GitHub
         document.getElementById('fileInput').value = filePaths.join(', ');
         organizeFiles();
         
     } catch (error) {
         console.error('Помилка імпорту з GitHub:', error);
         outputDiv.innerHTML = `❌ Помилка: ${error.message}`;
-    }
-}
-
-function handleDroppedFiles(files) {
-    const fileNames = [];
-    for (let i = 0; i < files.length; i++) {
-        fileNames.push(files[i].name);
-    }
-    
-    if (fileNames.length > 0) {
-        document.getElementById('fileInput').value = fileNames.join(', ');
-        organizeFiles();
     }
 }
 
@@ -106,6 +181,7 @@ function loadPreset(type) {
     const fileInput = document.getElementById('fileInput');
     const ignoreInput = document.getElementById('ignoreInput');
     const customRulesInput = document.getElementById('customRulesInput');
+    loadedFileContents = {};
 
     if (type === 'python') {
         fileInput.value = "main.py, utils.py, requirements.txt, README.md, .env, test_script.py";
@@ -133,7 +209,7 @@ function organizeFiles() {
     const statsPanel = document.getElementById('statsPanel');
     
     if (!input.trim()) {
-        outputDiv.innerHTML = "Будь ласка, введіть хоча б одне ім'я файлу або виконайте імпорт з GitHub.";
+        outputDiv.innerHTML = "Будь ласка, виберіть папку, імпортуйте репозиторій або введіть імена файлів.";
         actionButtons.style.display = 'none';
         statsPanel.style.display = 'none';
         return;
@@ -173,7 +249,8 @@ function organizeFiles() {
             return;
         }
 
-        const parts = file.split('.');
+        const fileNameOnly = file.split('/').pop();
+        const parts = fileNameOnly.split('.');
         const ext = parts.length > 1 ? parts.pop().toUpperCase() : 'NO_EXTENSION';
         const targetFolder = customRules[ext] || ext;
 
@@ -205,31 +282,24 @@ function organizeFiles() {
 }
 
 function getFileTemplateContent(fileName) {
+    // Якщо для цього файлу вже є реальний завантажений контент з ПК — використовуємо його!
+    if (loadedFileContents[fileName] !== undefined && loadedFileContents[fileName] !== null) {
+        return loadedFileContents[fileName];
+    }
+
     const lowerName = fileName.toLowerCase();
     
-    if (lowerName === 'readme.md') {
-        return `# Project Overview\n\nGenerated automatically via Microservice Automation Tool.\n\n## Getting Started\n1. Install dependencies\n2. Run the application`;
+    if (lowerName.includes('readme.md')) {
+        return `# Project Overview\n\nRefactored automatically via Microservice Automation Tool.`;
     }
-    if (lowerName === 'package.json') {
-        return `{\n  "name": "generated-project",\n  "version": "1.0.0",\n  "description": "Scaffolded project structure",\n  "main": "index.js",\n  "scripts": {\n    "start": "node index.js"\n  },\n  "dependencies": {}\n}`;
+    if (lowerName.includes('package.json')) {
+        return `{\n  "name": "refactored-project",\n  "version": "1.0.0"\n}`;
     }
-    if (lowerName === 'requirements.txt') {
-        return `# Python dependencies\nrequests>=2.31.0\npandas>=2.0.0\npython-dotenv>=1.0.0`;
-    }
-    if (lowerName === '.gitignore') {
-        return `node_modules/\nvenv/\n__pycache__/\n.env\n.DS_Store`;
-    }
-    if (lowerName.endsWith('.html')) {
-        return `<!DOCTYPE html>\n<html lang="uk">\n<head>\n    <meta charset="UTF-8">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello World</h1>\n</body>\n</html>`;
-    }
-    if (lowerName.endsWith('.py')) {
-        return `# -*- coding: utf-8 -*-\n\ndef main():\n    print("Microservice is running...")\n\nif __name__ == "__main__":\n    main()`;
-    }
-    if (lowerName.endsWith('.css')) {
-        return `body {\n    font-family: Arial, sans-serif;\n    background-color: #0f172a;\n    color: #f8fafc;\n    margin: 0;\n    padding: 20px;\n}`;
+    if (lowerName.includes('requirements.txt')) {
+        return `requests>=2.31.0\npandas>=2.0.0`;
     }
     
-    return `Автоматично згенерований шаблон для файлу: ${fileName}`;
+    return `Автоматично згенерований вміст для: ${fileName}`;
 }
 
 async function downloadZip() {
@@ -237,9 +307,10 @@ async function downloadZip() {
     
     for (const [folderName, fileList] of Object.entries(organizedStructure)) {
         const folder = zip.folder(folderName);
-        fileList.forEach(fileName => {
-            const templateContent = getFileTemplateContent(fileName);
-            folder.file(fileName, templateContent);
+        fileList.forEach(filePath => {
+            const fileNameOnly = filePath.split('/').pop();
+            const content = getFileTemplateContent(filePath);
+            folder.file(fileNameOnly, content);
         });
     }
 
@@ -248,7 +319,7 @@ async function downloadZip() {
         const url = URL.createObjectURL(content);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'scaffolded-project.zip';
+        a.download = 'refactored-project.zip';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -264,10 +335,11 @@ function copyProjectTree() {
     
     for (const [folderName, fileList] of Object.entries(organizedStructure)) {
         treeText += `├── ${folderName}/\n`;
-        fileList.forEach((fileName, index) => {
+        fileList.forEach((filePath, index) => {
+            const fileNameOnly = filePath.split('/').pop();
             const isLast = index === fileList.length - 1;
             const prefix = isLast ? "│   └── " : "│   ├── ";
-            treeText += `${prefix}${fileName}\n`;
+            treeText += `${prefix}${fileNameOnly}\n`;
         });
     }
     treeText += "```";
