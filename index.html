@@ -27,11 +27,16 @@
                     <button type="button" onclick="loadPreset('data')" style="background-color: #334155; font-size: 12px; padding: 6px 10px; width: auto;">📊 Data Science</button>
                 </div>
 
+                <!-- Зона Drag-and-Drop -->
+                <div id="dropZone" style="border: 2px dashed #334155; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 15px; background: #0f172a; color: #94a3b8; transition: 0.2s;">
+                    Перетягніть файли сюди або введіть їх вручну нижче
+                </div>
+
                 <p>Введіть імена файлів, розділені комами:</p>
-                <input type="text" id="fileInput" placeholder="документ.pdf, фото.png, скрипт.py, архів.zip">
+                <input type="text" id="fileInput" placeholder="документ.pdf, фото.png, скрипт.py, архів.zip" oninput="processManualInput()">
 
                 <p>Ігнорувати файли/маски (через кому):</p>
-                <input type="text" id="ignoreInput" placeholder=".env, node_modules, temp.*">
+                <input type="text" id="ignoreInput" placeholder=".env, node_modules, temp.*" oninput="organizeFiles()">
 
                 <button onclick="organizeFiles()">Сортувати файли</button>
                 
