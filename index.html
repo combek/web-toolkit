@@ -45,6 +45,10 @@
                 <p>Ігнорувати файли/маски (через кому):</p>
                 <input type="text" id="ignoreInput" placeholder=".env, node_modules, temp.*" oninput="organizeFiles()">
 
+                <!-- Кастомні правила мапінгу -->
+                <p>Кастомні правила (розширення:папка через кому):</p>
+                <input type="text" id="customRulesInput" placeholder="md: docs, json: config" oninput="organizeFiles()">
+
                 <button onclick="organizeFiles()">Сортувати файли</button>
                 
                 <!-- Блок статистики -->
