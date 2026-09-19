@@ -254,7 +254,6 @@ function organizeFiles() {
         organizedStructure[targetFolder].push(file);
         totalProcessedFiles++;
 
-        // Робимо файли клікабельними для відкриття редактора
         resultHTML += `➔ <span onclick="openFileEditor('${file.replace(/'/g, "\\'")}')" style="color: #38bdf8; cursor: pointer; text-decoration: underline;" title="Клікніть щоб редагувати вміст">${file}</span> &nbsp;&nbsp;📂 [/${targetFolder}/]<br>`;
     });
 
@@ -276,7 +275,6 @@ function organizeFiles() {
     actionButtons.style.display = hasFilesToDownload ? 'flex' : 'none';
 }
 
-// Функції управління модальним редактором
 function openFileEditor(filePath) {
     currentEditingFile = filePath;
     document.getElementById('modalFileName').textContent = `Редагування: ${filePath}`;
@@ -350,6 +348,76 @@ async function downloadZip() {
         console.error('ZIP generation error:', error);
         alert('Failed to generate ZIP archive.');
     }
+}
+
+// Генерація та завантаження Python CLI скрипта на основі поточних правил
+function exportPythonCli() {
+    const ignoreInput = document.getElementById('ignoreInput').value;
+    const customRulesInput = document.getElementById('customRulesInput').value;
+
+    const ignorePatterns = ignoreInput.split(',').map(p => p.trim()).filter(p => p.length > 0);
+    
+    const customRules = {};
+    customRulesInput.split(',').forEach(rule => {
+        const parts = rule.split(':');
+        if (parts.length === 2) {
+            const ext = parts[0].trim().toUpperCase();
+            const folder = parts[1].trim().toUpperCase();
+            if (ext && folder) {
+                customRules[ext] = folder;
+            }
+        }
+    });
+
+    // Формуємо Python скрипт
+    const pythonScriptCode = `# -*- coding: utf-8 -*-
+import os
+import shutil
+
+# Згенеровано автоматично через Microservice Automation Tool
+IGNORE_PATTERNS = ${JSON.stringify(ignorePatterns)}
+CUSTOM_RULES = ${JSON.stringify(customRules)}
+
+def organize_directory(target_dir="."):
+    print(f"🚀 Початок організації директорії: {os.path.abspath(target_dir)}")
+    
+    for item in os.listdir(target_dir):
+        if item in IGNORE_PATTERNS or item == "organize.py":
+            continue
+            
+        item_path = os.path.join(target_dir, item)
+        if os.path.isdir(item_path):
+            continue
+            
+        # Визначаємо розширення
+        ext = item.split('.')[-1].upper() if '.' in item else "NO_EXTENSION"
+        target_folder = CUSTOM_RULES.get(ext, ext)
+        
+        folder_path = os.path.join(target_dir, target_folder)
+        os.makedirs(folder_path, exist_ok=True)
+        
+        dest_path = os.path.join(folder_path, item)
+        if not os.path.exists(dest_path):
+            shutil.move(item_path, dest_path)
+            print(f"➔ Переміщено: {item} -> {target_folder}/")
+        else:
+            print(f"⚠️ Пропущено (вже існує): {item}")
+
+    print("✅ Організацію успішно завершено!")
+
+if __name__ == "__main__":
+    organize_directory()
+`;
+
+    const blob = new Blob([pythonScriptCode], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'organize.py';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 function copyProjectTree() {
