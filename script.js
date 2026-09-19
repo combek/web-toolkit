@@ -28,6 +28,49 @@ window.addEventListener('DOMContentLoaded', () => {
     }, false);
 });
 
+// Функція імпорту структури з GitHub API
+async function importFromGitHub() {
+    const repoInput = document.getElementById('githubRepoInput').value.trim();
+    const outputDiv = document.getElementById('output');
+
+    if (!repoInput) {
+        alert('Будь ласка, введіть репозиторій у форматі owner/repo (наприклад, octocat/Spoon-Knife)');
+        return;
+    }
+
+    outputDiv.innerHTML = "⏳ Завантаження структури з GitHub...";
+
+    try {
+        // Використовуємо публічне GitHub API для отримання дерева репозиторію (гілка за замовчуванням)
+        const repoClean = repoInput.replace('https://github.com/', '').replace(/\/$/, '');
+        const response = await fetch(`https://api.github.com/repos/${repoClean}/git/trees/HEAD?recursive=1`);
+        
+        if (!response.ok) {
+            throw new Error('Репозиторій не знайдено або перевищено ліміт запитів API.');
+        }
+
+        const data = await response.json();
+        
+        // Фільтруємо лише файли (не папки) та беремо їх шляхи
+        const filePaths = data.tree
+            .filter(item => item.type === 'blob')
+            .map(item => item.path);
+
+        if (filePaths.length === 0) {
+            outputDiv.innerHTML = "⚠️ У цьому репозиторії не знайдено файлів.";
+            return;
+        }
+
+        // Записуємо отримані файли у поле введення та запускаємо сортування
+        document.getElementById('fileInput').value = filePaths.join(', ');
+        organizeFiles();
+        
+    } catch (error) {
+        console.error('Помилка імпорту з GitHub:', error);
+        outputDiv.innerHTML = `❌ Помилка: ${error.message}`;
+    }
+}
+
 function handleDroppedFiles(files) {
     const fileNames = [];
     for (let i = 0; i < files.length; i++) {
@@ -70,7 +113,7 @@ function organizeFiles() {
     const statsPanel = document.getElementById('statsPanel');
     
     if (!input.trim()) {
-        outputDiv.innerHTML = "Будь ласка, введіть хоча б одне ім'я файлу або перетягніть їх у зону вище.";
+        outputDiv.innerHTML = "Будь ласка, введіть хоча б одне ім'я файлу або виконайте імпорт з GitHub.";
         actionButtons.style.display = 'none';
         statsPanel.style.display = 'none';
         return;
@@ -114,7 +157,6 @@ function organizeFiles() {
         resultHTML += `<br><span style="color: #94a3b8; font-size: 12px;">Проігноровано файлів: ${ignoredCount}</span>`;
     }
 
-    // Відображення панелі статистики
     const totalCategories = Object.keys(organizedStructure).length;
     if (totalProcessedFiles > 0) {
         statsPanel.style.display = 'block';
