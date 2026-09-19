@@ -4,28 +4,24 @@ function organizeFiles() {
     const input = document.getElementById('fileInput').value;
     const ignoreInput = document.getElementById('ignoreInput').value;
     const outputDiv = document.getElementById('output');
-    const downloadBtn = document.getElementById('downloadZipBtn');
+    const actionButtons = document.getElementById('actionButtons');
     
     if (!input.trim()) {
         outputDiv.innerHTML = "Будь ласка, введіть хоча б одне ім'я файлу.";
-        downloadBtn.style.display = 'none';
+        actionButtons.style.display = 'none';
         return;
     }
 
-    // Отримуємо список файлів та список масок для ігнорування
     const files = input.split(',').map(f => f.trim()).filter(f => f.length > 0);
     const ignorePatterns = ignoreInput.split(',').map(p => p.trim()).filter(p => p.length > 0);
 
     let resultHTML = "<strong>Результати сортування:</strong><br>";
     organizedStructure = {};
-    
     let ignoredCount = 0;
 
     files.forEach(file => {
-        // Перевіряємо, чи підпадає файл під правила ігнорування
         const isIgnored = ignorePatterns.some(pattern => {
             if (pattern.includes('*')) {
-                // Проста підтримка зірочки (наприклад, temp.*)
                 const regex = new RegExp('^' + pattern.replace('*', '.*') + '$', 'i');
                 return regex.test(file);
             }
@@ -34,7 +30,7 @@ function organizeFiles() {
 
         if (isIgnored) {
             ignoredCount++;
-            return; // Пропускаємо цей файл
+            return;
         }
 
         const parts = file.split('.');
@@ -54,9 +50,8 @@ function organizeFiles() {
 
     outputDiv.innerHTML = resultHTML;
     
-    // Показуємо кнопку завантаження, тільки якщо є файли після фільтрації
     const hasFilesToDownload = Object.keys(organizedStructure).length > 0;
-    downloadBtn.style.display = hasFilesToDownload ? 'block' : 'none';
+    actionButtons.style.display = hasFilesToDownload ? 'flex' : 'none';
 }
 
 async function downloadZip() {
@@ -83,4 +78,25 @@ async function downloadZip() {
         console.error('Помилка генерації ZIP-архіву:', error);
         alert('Не вдалося згенерувати ZIP-архів.');
     }
+}
+
+function copyProjectTree() {
+    let treeText = "```text\nproject-root/\n";
+    
+    for (const [folderName, fileList] of Object.entries(organizedStructure)) {
+        treeText += `├── ${folderName}/\n`;
+        fileList.forEach((fileName, index) => {
+            const isLast = index === fileList.length - 1;
+            const prefix = isLast ? "│   └── " : "│   ├── ";
+            treeText += `${prefix}${fileName}\n`;
+        });
+    }
+    treeText += "```";
+
+    navigator.clipboard.writeText(treeText).then(() => {
+        alert('Схему проєкту скопійовано у форматі Markdown!');
+    }).catch(err => {
+        console.error('Помилка копіювання:', err);
+        alert('Не вдалося скопіювати схему.');
+    });
 }
