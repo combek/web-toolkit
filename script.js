@@ -1,5 +1,25 @@
 let organizedStructure = {};
 
+// Функція завантаження пресетів
+function loadPreset(type) {
+    const fileInput = document.getElementById('fileInput');
+    const ignoreInput = document.getElementById('ignoreInput');
+
+    if (type === 'python') {
+        fileInput.value = "main.py, utils.py, requirements.txt, README.md, .env, test_script.py";
+        ignoreInput.value = ".env, __pycache__, venv";
+    } else if (type === 'web') {
+        fileInput.value = "index.html, style.css, script.js, package.json, logo.png, hero.jpg";
+        ignoreInput.value = "node_modules, .DS_Store";
+    } else if (type === 'data') {
+        fileInput.value = "analysis.ipynb, dataset.csv, report.pdf, config.json, output.png";
+        ignoreInput.value = "*.tmp, .ipynb_checkpoints";
+    }
+    
+    // Автоматично запускаємо сортування при виборі пресету
+    organizeFiles();
+}
+
 function organizeFiles() {
     const input = document.getElementById('fileInput').value;
     const ignoreInput = document.getElementById('ignoreInput').value;
