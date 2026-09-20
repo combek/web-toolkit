@@ -7,13 +7,15 @@
   <i>Zero server upload, complete privacy, and instant Python CLI export.</i>
 </p>
 
-[![Deployment Status](https://img.shields.io/badge/Vercel-Production-brightgreen?style=for-the-badge&logo=vercel)](https://web-toolkit-jade.vercel.app)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Client-Side](https://img.shields.io/badge/Architecture-100%25%20Client%20Side-orange?style=for-the-badge&logo=javascript)](https://web-toolkit-jade.vercel.app)
+<p align="center">
+  <a href="https://web-toolkit-jade.vercel.app"><img src="https://img.shields.io/badge/Vercel-Production-brightgreen?style=for-the-badge&logo=vercel" alt="Vercel"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"></a>
+  <a href="https://web-toolkit-jade.vercel.app"><img src="https://img.shields.io/badge/Architecture-100%25%20Client%20Side-orange?style=for-the-badge&logo=javascript" alt="Client-Side"></a>
+</p>
 
   <br>
   <a href="https://web-toolkit-jade.vercel.app">
-    <img src="https://img.shields.io/badge/🚀_TRY_LIVE_APP-HЕ_В_ОДИН_КЛІК-blueviolet?style=for-the-badge&scale=2" alt="Try Live App" height="40">
+    <img src="https://img.shields.io/badge/🚀_TRY_LIVE_APP-LAUNCH_APP-blueviolet?style=for-the-badge" alt="Try Live App" height="40">
   </a>
   <br><br>
 
