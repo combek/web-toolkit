@@ -92,3 +92,10 @@ function initSecretsLinter() {
         return foundIssues;
     }
 }
+// Обробка кліку на кнопку купівлі Pro-тарифу
+const upgradeBtn = document.getElementById('upgrade-btn');
+if (upgradeBtn) {
+    upgradeBtn.addEventListener('click', () => {
+        alert('Дякуємо за інтерес до Pro-версії! У реальному середовищі тут відбуватиметься перенаправлення на платіжний шлюз (Stripe / LiqPay / WayForPay).');
+    });
+}
