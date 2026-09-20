@@ -26,7 +26,7 @@
             <section class="card">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
                     <h2 style="margin: 0; font-size: 18px; display: flex; align-items: center; gap: 8px;">📁 File Structure Organizer</h2>
-                    <span style="font-size: 12px; color: var(--text-muted);">v1.0 Production</span>
+                    <span style="font-size: 12px; color: var(--text-muted);">v1.2 Pro Edition</span>
                 </div>
                 
                 <p>Select or drag the actual folder from the project:</p>
@@ -49,7 +49,8 @@
                 </div>
 
                 <div id="dropZone" style="border: 2px dashed var(--border-color); padding: 25px; text-align: center; border-radius: 8px; margin-bottom: 15px; background: var(--input-bg); color: var(--text-muted); transition: 0.2s; cursor: pointer;">
-                    📥 Drag a folder or files here, or enter them manually below
+                    📥 Drag a folder or files here, or enter them manually below <br>
+                    <span style="font-size: 11px; opacity: 0.7;">(Підказка: натисніть Ctrl + Enter для миттєвого сортування)</span>
                 </div>
 
                 <p>Enter the filenames separated by commas:</p>
@@ -68,16 +69,17 @@
                 <div id="output" class="output"></div>
                 
                 <div id="actionButtons" style="display: none; margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1; min-width: 180px;">📦 Download ZIP archive</button>
-                    <button id="exportCliBtn" onclick="exportPythonCli()" style="background-color: #10b981; color: white; flex: 1; min-width: 180px;">📥 Python CLI Script</button>
-                    <button id="sharePresetBtn" onclick="sharePresetUrl()" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 180px;">🔗 Share Preset Link</button>
-                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1; min-width: 180px;">📋 Copy Markdown Tree</button>
+                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1; min-width: 160px;">📦 Download ZIP</button>
+                    <button id="exportCliBtn" onclick="exportPythonCli()" style="background-color: #10b981; color: white; flex: 1; min-width: 160px;">📥 Python CLI</button>
+                    <button id="exportGitignoreBtn" onclick="exportGitignore()" style="background-color: #f59e0b; color: white; flex: 1; min-width: 160px;">📄 Gen .gitignore</button>
+                    <button id="sharePresetBtn" onclick="sharePresetUrl()" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 160px;">🔗 Share Link</button>
+                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1; min-width: 160px;">📋 Copy Tree</button>
                 </div>
             </section>
         </main>
 
         <footer style="text-align: center; margin-top: 30px; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-            Python & Web Automation Toolkit • Built for developers, data scientists, and DevOps engineers. Secure, fast, and open.
+            Python & Web Automation Toolkit • Pro Edition for Developers & DevOps. Secure, fast, and 100% private.
         </footer>
     </div>
 
@@ -85,13 +87,18 @@
     <div id="fileEditorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
         <div style="background: var(--card-bg); border: 1px solid var(--border-color); width: 90%; max-width: 600px; padding: 20px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
             <h3 id="modalFileName" style="margin-top: 0; color: var(--text-color);">Редагування файлу</h3>
-            <p style="font-size: 12px; color: var(--text-muted);">Змініть вміст файлу перед додаванням до фінального архіву:</p>
+            <p style="font-size: 12px; color: var(--text-muted);">Змініть вміст файлу перед додаванням до фінального архіву (ESC для закриття):</p>
             <textarea id="modalFileContent" style="width: 100%; height: 200px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-family: monospace; font-size: 13px; box-sizing: border-box; resize: vertical;"></textarea>
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button type="button" onclick="saveFileContent()" style="background-color: #0284c7; flex: 1;">💾 Зберегти зміни</button>
                 <button type="button" onclick="closeFileEditor()" style="background-color: #334155; flex: 1;">❌ Скасувати</button>
             </div>
         </div>
+    </div>
+
+    <!-- Тост-сповіщення (вспливаюче вікно замість alert) -->
+    <div id="toastNotification" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 2000; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); transition: opacity 0.3s;">
+        Успішно виконано!
     </div>
 
     <script src="script.js"></script>
