@@ -1,58 +1,38 @@
-# ⚡ Web Toolkit
+# 🛠️ Combek Web Toolkit
 
-<div align="center">
-
-  <p><b>100% Client-side file structure organizer & automation tool for developers.</b><br>
-  <i>Zero server upload, complete privacy, and instant Python CLI export.</i></p>
-
-  <p>
-    <a href="https://web-toolkit-jade.vercel.app"><img src="https://img.shields.io/badge/Vercel-Production-brightgreen?style=for-the-badge&logo=vercel" alt="Vercel"></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"></a>
-    <a href="https://web-toolkit-jade.vercel.app"><img src="https://img.shields.io/badge/Architecture-100%25%20Client%20Side-orange?style=for-the-badge&logo=javascript" alt="Client-Side"></a>
-  </p>
-
-  <p>
-    <a href="https://web-toolkit-jade.vercel.app">
-      <img src="https://img.shields.io/badge/🚀_TRY_LIVE_APP-LAUNCH_APP-blueviolet?style=for-the-badge" alt="Try Live App" height="40">
-    </a>
-  </p>
-
-</div>
+A professional, 100% client-side developer utility designed for file structure standardization, project organization, and built-in security auditing. No server uploads—all processing happens directly and securely in your browser.
 
 ---
 
-## 📌 Overview
+## 🚀 Key Features
 
-**Web Toolkit** is a specialized, lightning-fast utility designed for developers, engineers, and data scientists. It runs entirely inside your browser, allowing you to organize complex file structures, refactor directories, and instantly generate clean Python automation scripts without uploading a single byte of your source code to external servers.
-
----
-
-## ✨ Key Features
-
-- **🔒 100% Client-Side Privacy:** Your files and folder structures never leave your local machine. Zero server upload.
-- **📂 File Structure Organizer:** Intelligently structure, sort, and clean up nested project directories in seconds.
-- **🐍 Python CLI Script Generator:** Automatically turn your workspace configuration into a ready-to-run Python automation script (`.py`).
-- **⚡ Instant Presets:** Pre-configured optimization profiles for *Python Stack*, *Web / React*, and *Data Science* environments.
+* **Client-Side Privacy:** Your files never leave your machine. Zero server-side data collection or storage.
+* **Smart File Organization:** Quickly standardize project layouts and generate clean folder structures.
+* **🔒 Secrets Linter:** Automatically scans your project files for accidentally exposed API keys (OpenAI, Telegram, AWS, GitHub tokens) and private variables before you push code to GitHub.
+* **Instant Automation:** Generate helper scripts (like Python CLI scripts) to automate your file management routines.
 
 ---
 
-## 🚀 Quick Start & Usage
+## ⚙️ How to Use
 
-1. Open the live application: [**web-toolkit-jade.vercel.app**](https://web-toolkit-jade.vercel.app)
-2. Drag and drop your project folder or select it via the disk picker.
-3. Choose your target automation preset or configure manual rules.
-4. Download the structured archive (`.zip`) or copy the generated Python automation script.
+1. Open the application live on Vercel.
+2. Drag and drop your project folder or select files using the interface.
+3. The built-in **Secrets Linter** will instantly inspect your code and configuration files (such as `.env` or `config.json`) for sensitive data leaks.
+4. Download your organized setup and generated automation scripts.
 
 ---
 
-## 🛠️ Built With
+## ☕ Support the Project
 
-- **Vanilla JavaScript (ES6+)** — For maximum performance and zero dependency bloat.
-- **Tailwind CSS** — For a modern, responsive, developer-friendly UI.
-- **Vercel** — For lightning-fast global edge deployment and reliable CI/CD.
+If this tool saved you time or helped organize your workflow, you can support its development and future improvements:
+
+* **[Buy Me a Coffee / Ko-fi](https://www.buymeacoffee.com/YOUR_USERNAME)** — support via credit card or Apple/Google Pay.
+* **Crypto (USDT TRC-20):** `YOUR_USDT_TRC20_WALLET_ADDRESS`
+
+*All funds go directly into project maintenance, feature development, and marketing growth.*
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.
