@@ -2,8 +2,8 @@
 
 # 🚀 Alex-Dev-Web-C-DE
 
-[![GitHub release](https://img.shields.io/github/v/release/Alex-Dev-Web-C-DE/Alex-Dev-Web-C-DE?include_prereleases&style=flat-square)](https://github.com/Alex-Dev-Web-C-DE/Alex-Dev-Web-C-DE/releases)
-[![License](https://img.shields.io/github/license/Alex-Dev-Web-C-DE/Alex-Dev-Web-C-DE?style=flat-square)](LICENSE)
+[![Profile Views](https://komarev.com/ghpvc/?username=Alex-Dev-Web-C-DE&style=flat-square&color=blue)](https://github.com/Alex-Dev-Web-C-DE)
+[![GitHub Status](https://img.shields.io/badge/status-active-success?style=flat-square)](https://github.com/Alex-Dev-Web-C-DE)
 
 *Ласкаво просимо до офіційного репозиторію портфоліо та вебпроєктів!*
 
