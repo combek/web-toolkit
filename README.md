@@ -1,23 +1,21 @@
-<div align="center">
-
 # ⚡ Web Toolkit
 
-<p align="center">
-  <b>100% Client-side file structure organizer & automation tool for developers.</b><br>
-  <i>Zero server upload, complete privacy, and instant Python CLI export.</i>
-</p>
+<div align="center">
 
-<p align="center">
-  <a href="https://web-toolkit-jade.vercel.app"><img src="https://img.shields.io/badge/Vercel-Production-brightgreen?style=for-the-badge&logo=vercel" alt="Vercel"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"></a>
-  <a href="https://web-toolkit-jade.vercel.app"><img src="https://img.shields.io/badge/Architecture-100%25%20Client%20Side-orange?style=for-the-badge&logo=javascript" alt="Client-Side"></a>
-</p>
+  <p><b>100% Client-side file structure organizer & automation tool for developers.</b><br>
+  <i>Zero server upload, complete privacy, and instant Python CLI export.</i></p>
 
-  <br>
-  <a href="https://web-toolkit-jade.vercel.app">
-    <img src="https://img.shields.io/badge/🚀_TRY_LIVE_APP-LAUNCH_APP-blueviolet?style=for-the-badge" alt="Try Live App" height="40">
-  </a>
-  <br><br>
+  <p>
+    <a href="https://web-toolkit-jade.vercel.app"><img src="https://img.shields.io/badge/Vercel-Production-brightgreen?style=for-the-badge&logo=vercel" alt="Vercel"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"></a>
+    <a href="https://web-toolkit-jade.vercel.app"><img src="https://img.shields.io/badge/Architecture-100%25%20Client%20Side-orange?style=for-the-badge&logo=javascript" alt="Client-Side"></a>
+  </p>
+
+  <p>
+    <a href="https://web-toolkit-jade.vercel.app">
+      <img src="https://img.shields.io/badge/🚀_TRY_LIVE_APP-LAUNCH_APP-blueviolet?style=for-the-badge" alt="Try Live App" height="40">
+    </a>
+  </p>
 
 </div>
 
