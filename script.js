@@ -27,8 +27,19 @@ window.addEventListener('DOMContentLoaded', () => {
         organizeFiles();
     }
 
-    const dropZone = document.getElementById('dropZone');
+    // Глобальні гарячі клавіші (Ctrl + Enter для сортування, Esc для закриття модалки)
+    window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            organizeFiles();
+            showToast('⚡ Сортування активовано гарячою клавішею!');
+        }
+        if (e.key === 'Escape') {
+            closeFileEditor();
+        }
+    });
 
+    const dropZone = document.getElementById('dropZone');
     dropZone.addEventListener('click', () => {
         document.getElementById('folderInput').click();
     });
@@ -74,6 +85,21 @@ function toggleTheme() {
     }
 }
 
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toastNotification');
+    toast.textContent = message;
+    toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
+    toast.style.display = 'block';
+    toast.style.opacity = '1';
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 300);
+    }, 2500);
+}
+
 async function handleFolderSelect(event) {
     const files = event.target.files;
     processFileList(files);
@@ -93,6 +119,7 @@ async function handleDroppedItems(items) {
     if (filePaths.length > 0) {
         document.getElementById('fileInput').value = filePaths.join(', ');
         organizeFiles();
+        showToast('📂 Папку успішно імпортовано!');
     }
 }
 
@@ -155,7 +182,7 @@ async function importFromGitHub() {
     const outputDiv = document.getElementById('output');
 
     if (!repoInput) {
-        alert('Будь ласка, введіть репозиторій у форматі owner/repo');
+        showToast('Введіть репозиторій у форматі owner/repo', 'error');
         return;
     }
 
@@ -166,7 +193,7 @@ async function importFromGitHub() {
         const response = await fetch(`https://api.github.com/repos/${repoClean}/git/trees/HEAD?recursive=1`);
         
         if (!response.ok) {
-            throw new Error('Репозиторій не знайдено або перевищено ліміт запитів API.');
+            throw new Error('Репозиторій не знайдено або перевищено ліміт API.');
         }
 
         const data = await response.json();
@@ -175,17 +202,19 @@ async function importFromGitHub() {
             .map(item => item.path);
 
         if (filePaths.length === 0) {
-            outputDiv.innerHTML = "⚠️ У цьому репозиторії не знайдено файлів.";
+            outputDiv.innerHTML = "⚠️ У цьому репозиторії немає файлів.";
             return;
         }
 
         loadedFileContents = {}; 
         document.getElementById('fileInput').value = filePaths.join(', ');
         organizeFiles();
+        showToast('🌐 GitHub репозиторій успішно завантажено!');
         
     } catch (error) {
         console.error('Помилка GitHub імпорту:', error);
         outputDiv.innerHTML = `❌ Помилка: ${error.message}`;
+        showToast('Не вдалося імпортувати репозиторій', 'error');
     }
 }
 
@@ -214,6 +243,7 @@ function loadPreset(type) {
     }
     
     organizeFiles();
+    showToast('✨ Пресет успішно завантажено!');
 }
 
 function organizeFiles() {
@@ -246,7 +276,7 @@ function organizeFiles() {
         }
     });
 
-    let resultHTML = "<strong>📊 Результати сортування (натисніть на файл для редагування вмісту):</strong><br><br>";
+    let resultHTML = "<strong>📊 Результати сортування (натисніть на файл для редагування):</strong><br><br>";
     organizedStructure = {};
     let ignoredCount = 0;
     let totalProcessedFiles = 0;
@@ -276,7 +306,7 @@ function organizeFiles() {
         organizedStructure[targetFolder].push(file);
         totalProcessedFiles++;
 
-        resultHTML += `➔ <span onclick="openFileEditor('${file.replace(/'/g, "\\'")}')" style="color: #38bdf8; cursor: pointer; text-decoration: underline;" title="Редагувати вміст файлу">${file}</span> &nbsp;&nbsp;📂 [/${targetFolder}/]<br>`;
+        resultHTML += `➔ <span onclick="openFileEditor('${file.replace(/'/g, "\\'")}')" style="color: #38bdf8; cursor: pointer; text-decoration: underline;" title="Редагувати вміст">${file}</span> &nbsp;&nbsp;📂 [/${targetFolder}/]<br>`;
     });
 
     if (ignoredCount > 0) {
@@ -286,7 +316,7 @@ function organizeFiles() {
     const totalCategories = Object.keys(organizedStructure).length;
     if (totalProcessedFiles > 0) {
         statsPanel.style.display = 'block';
-        statsPanel.innerHTML = `📈 <b>Аналітика сесії:</b> Опрацьовано файлів: <b>${totalProcessedFiles}</b> | Створено папок: <b>${totalCategories}</b> | Відфільтровано: <b>${ignoredCount}</b>`;
+        statsPanel.innerHTML = `📈 <b>Аналітика сесії:</b> Опрацьовано: <b>${totalProcessedFiles}</b> | Створено папок: <b>${totalCategories}</b> | Відфільтровано: <b>${ignoredCount}</b>`;
     } else {
         statsPanel.style.display = 'none';
     }
@@ -319,7 +349,7 @@ function saveFileContent() {
     if (currentEditingFile) {
         const newContent = document.getElementById('modalFileContent').value;
         loadedFileContents[currentEditingFile] = newContent;
-        alert(`Зміни для файлу "${currentEditingFile}" успішно збережено!`);
+        showToast(`Зміни для "${currentEditingFile}" збережено!`);
     }
     closeFileEditor();
 }
@@ -330,9 +360,8 @@ function getFileTemplateContent(fileName) {
     }
 
     const lowerName = fileName.toLowerCase();
-    
     if (lowerName.includes('readme.md')) {
-        return `# Project Overview\n\nRefactored automatically via Microservice Automation Tool.`;
+        return `# Project Overview\n\nRefactored automatically via Python & Web Automation Tools.`;
     }
     if (lowerName.includes('package.json')) {
         return `{\n  "name": "refactored-project",\n  "version": "1.0.0"\n}`;
@@ -366,9 +395,10 @@ async function downloadZip() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        showToast('📦 ZIP-архів успішно завантажено!');
     } catch (error) {
-        console.error('Помилка генерації ZIP:', error);
-        alert('Не вдалося згенерувати ZIP-архів.');
+        console.error('Помилка ZIP:', error);
+        showToast('Не вдалося створити архів', 'error');
     }
 }
 
@@ -377,16 +407,13 @@ function exportPythonCli() {
     const customRulesInput = document.getElementById('customRulesInput').value;
 
     const ignorePatterns = ignoreInput.split(',').map(p => p.trim()).filter(p => p.length > 0);
-    
     const customRules = {};
     customRulesInput.split(',').forEach(rule => {
         const parts = rule.split(':');
         if (parts.length === 2) {
             const ext = parts[0].trim().toUpperCase();
             const folder = parts[1].trim().toUpperCase();
-            if (ext && folder) {
-                customRules[ext] = folder;
-            }
+            if (ext && folder) customRules[ext] = folder;
         }
     });
 
@@ -394,35 +421,26 @@ function exportPythonCli() {
 import os
 import shutil
 
-# Згенеровано автоматично через Python & Web Automation Tools
+# Згенеровано через Python & Web Automation Tools (Pro Edition)
 IGNORE_PATTERNS = ${JSON.stringify(ignorePatterns)}
 CUSTOM_RULES = ${JSON.stringify(customRules)}
 
 def organize_directory(target_dir="."):
-    print(f"🚀 Початок організації директорії: {os.path.abspath(target_dir)}")
-    
+    print(f"🚀 Організація директорії: {os.path.abspath(target_dir)}")
     for item in os.listdir(target_dir):
         if item in IGNORE_PATTERNS or item == "organize.py":
             continue
-            
         item_path = os.path.join(target_dir, item)
         if os.path.isdir(item_path):
             continue
-            
         ext = item.split('.')[-1].upper() if '.' in item else "NO_EXTENSION"
         target_folder = CUSTOM_RULES.get(ext, ext)
-        
         folder_path = os.path.join(target_dir, target_folder)
         os.makedirs(folder_path, exist_ok=True)
-        
         dest_path = os.path.join(folder_path, item)
         if not os.path.exists(dest_path):
             shutil.move(item_path, dest_path)
             print(f"➔ Переміщено: {item} -> {target_folder}/")
-        else:
-            print(f"⚠️ Пропущено (вже існує): {item}")
-
-    print("✅ Організацію успішно завершено!")
 
 if __name__ == "__main__":
     organize_directory()
@@ -437,6 +455,25 @@ if __name__ == "__main__":
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    showToast('📥 Python CLI скрипт завантажено!');
+}
+
+function exportGitignore() {
+    const ignoreInput = document.getElementById('ignoreInput').value;
+    const ignorePatterns = ignoreInput.split(',').map(p => p.trim()).filter(p => p.length > 0);
+
+    const gitignoreContent = `# Generated by Python & Web Automation Tools\n` + ignorePatterns.join('\n') + `\n`;
+
+    const blob = new Blob([gitignoreContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '.gitignore';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('📄 Файл .gitignore успішно згенеровано!');
 }
 
 function sharePresetUrl() {
@@ -450,16 +487,14 @@ function sharePresetUrl() {
     if (rules) url.searchParams.set('rules', rules);
 
     navigator.clipboard.writeText(url.toString()).then(() => {
-        alert('🔗 Посилання з пресетом успішно скопійовано в буфер обміну!');
-    }).catch(err => {
-        console.error('Помилка копіювання лінку:', err);
+        showToast('🔗 Посилання скопійовано в буфер!');
+    }).catch(() => {
         prompt('Скопіюйте посилання вручну:', url.toString());
     });
 }
 
 function copyProjectTree() {
     let treeText = "```text\nproject-root/\n";
-    
     for (const [folderName, fileList] of Object.entries(organizedStructure)) {
         treeText += `├── ${folderName}/\n`;
         fileList.forEach((filePath, index) => {
@@ -472,9 +507,8 @@ function copyProjectTree() {
     treeText += "```";
 
     navigator.clipboard.writeText(treeText).then(() => {
-        alert('📋 Дерево проєкту у форматі Markdown скопійовано в буфер!');
-    }).catch(err => {
-        console.error('Помилка копіювання:', err);
-        alert('Не вдалося скопіювати дерево.');
+        showToast('📋 Дерево проєкту скопійовано!');
+    }).catch(() => {
+        showToast('Не вдалося скопіювати', 'error');
     });
 }
