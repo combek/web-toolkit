@@ -26,8 +26,8 @@ A professional, 100% client-side developer utility designed for file structure s
 
 If this tool saved you time or helped organize your workflow, you can support its development and future improvements:
 
-* **[Buy Me a Coffee / Ko-fi](https://www.buymeacoffee.com/YOUR_USERNAME)** — support via credit card or Apple/Google Pay.
-* **Crypto (USDT TRC-20):** `YOUR_USDT_TRC20_WALLET_ADDRESS`
+* **[Buy Me a Coffee / Ko-fi](https://www.buymeacoffee.com/combek)** — support via credit card or Apple/Google Pay.
+* **Crypto (USDT TRC-20):** `T9yD14Nj9j7xAB4dbGeiX9h8unkKHxuWwb`
 
 *All funds go directly into project maintenance, feature development, and marketing growth.*
 
