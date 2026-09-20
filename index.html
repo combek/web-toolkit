@@ -3,104 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python and Web Automation Tools | File Structure Organizer</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Бібліотека JSZip для генерації архівів на клієнті -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <title>Alex-Dev-Web-C-DE | Project Manager</title>
+    <!-- Підключаємо Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 { margin: 0; font-size: 24px; color: #58a6ff; }
+        button {
+            background-color: #238636;
+            color: #ffffff;
+            border: none;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #2ea043; }
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
-            <div>
-                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px;">
-                    <span style="background: rgba(2, 132, 199, 0.15); color: #38bdf8; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">🔒 100% Client-Side</span>
-                    <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(52, 211, 153, 0.3);">⚡ Zero Server Upload</span>
-                </div>
-                <h1 style="margin: 0; font-size: 22px;">Python and Web Automation Tools</h1>
-                <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 13px;">Niche service for migration, refactoring, and file structure organization.</p>
-            </div>
-            <button type="button" onclick="toggleTheme()" id="themeToggleBtn" style="background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 16px; width: auto;" title="Змінити тему">☀️</button>
-        </header>
 
-        <main>
-            <section class="card">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                    <h2 style="margin: 0; font-size: 18px; display: flex; align-items: center; gap: 8px;">📁 File Structure Organizer</h2>
-                    <span style="font-size: 12px; color: var(--text-muted);">v1.2 Pro Edition</span>
-                </div>
-                
-                <p>Select or drag the actual folder from the project:</p>
-                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                    <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
-                    <button type="button" onclick="document.getElementById('folderInput').click()" class="btn-primary" style="background-color: #0284c7; flex: 1;">📂 Select a folder on the disk</button>
-                </div>
-
-                <p>Or import from a public GitHub repository:</p>
-                <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                    <input type="text" id="githubRepoInput" placeholder="owner/repo (наприклад: torvalds/linux)" style="margin-bottom: 0; flex: 1;">
-                    <button type="button" onclick="importFromGitHub()" class="btn-secondary" style="background-color: #334155; width: auto; padding: 10px 16px;">Import</button>
-                </div>
-
-                <p>Quick project presets:</p>
-                <div class="presets" style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
-                    <button type="button" onclick="loadPreset('python')" class="btn-tag">🐍 Python Stack</button>
-                    <button type="button" onclick="loadPreset('web')" class="btn-tag">🌐 Web / React</button>
-                    <button type="button" onclick="loadPreset('data')" class="btn-tag">📊 Data Science</button>
-                </div>
-
-                <div id="dropZone" style="border: 2px dashed var(--border-color); padding: 25px; text-align: center; border-radius: 8px; margin-bottom: 15px; background: var(--input-bg); color: var(--text-muted); transition: 0.2s; cursor: pointer;">
-                    📥 Drag a folder or files here, or enter them manually below <br>
-                    <span style="font-size: 11px; opacity: 0.7;">(Підказка: натисніть Ctrl + Enter для миттєвого сортування)</span>
-                </div>
-
-                <p>Enter the filenames separated by commas:</p>
-                <input type="text" id="fileInput" placeholder="document.pdf, photo.png, script.py, archive.zip" oninput="processManualInput()">
-
-                <p>Ignore files/masks (comma separated):</p>
-                <input type="text" id="ignoreInput" placeholder=".env, node_modules, temp.*" oninput="organizeFiles()">
-
-                <p>Custom rules (ext:folder comma separated):</p>
-                <input type="text" id="customRulesInput" placeholder="md: docs, json: config" oninput="organizeFiles()">
-
-                <button onclick="organizeFiles()" class="btn-action" style="background-color: #0284c7; font-size: 15px; padding: 12px; margin-top: 5px;">⚡ Sort files & Generate Architecture</button>
-                
-                <div id="statsPanel" style="display: none; margin-top: 15px; padding: 12px; background: var(--input-bg); border-radius: 6px; font-size: 13px; color: #38bdf8; border: 1px solid var(--border-color);"></div>
-
-                <div id="output" class="output"></div>
-                
-                <div id="actionButtons" style="display: none; margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button id="downloadZipBtn" onclick="downloadZip()" style="background-color: #0284c7; color: white; flex: 1; min-width: 160px;">📦 Download ZIP</button>
-                    <button id="exportCliBtn" onclick="exportPythonCli()" style="background-color: #10b981; color: white; flex: 1; min-width: 160px;">📥 Python CLI</button>
-                    <button id="exportGitignoreBtn" onclick="exportGitignore()" style="background-color: #f59e0b; color: white; flex: 1; min-width: 160px;">📄 Gen .gitignore</button>
-                    <button id="sharePresetBtn" onclick="sharePresetUrl()" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 160px;">🔗 Share Link</button>
-                    <button id="copyTreeBtn" onclick="copyProjectTree()" style="background-color: var(--border-color); color: var(--text-color); flex: 1; min-width: 160px;">📋 Copy Tree</button>
-                </div>
-            </section>
-        </main>
-
-        <footer style="text-align: center; margin-top: 30px; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-            Python & Web Automation Toolkit • Pro Edition for Developers & DevOps. Secure, fast, and 100% private.
-        </footer>
-    </div>
-
-    <!-- Модальне вікно Live-редактора файлів -->
-    <div id="fileEditorModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: var(--card-bg); border: 1px solid var(--border-color); width: 90%; max-width: 600px; padding: 20px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
-            <h3 id="modalFileName" style="margin-top: 0; color: var(--text-color);">Редагування файлу</h3>
-            <p style="font-size: 12px; color: var(--text-muted);">Змініть вміст файлу перед додаванням до фінального архіву (ESC для закриття):</p>
-            <textarea id="modalFileContent" style="width: 100%; height: 200px; background: var(--input-bg); color: var(--input-text); border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; font-family: monospace; font-size: 13px; box-sizing: border-box; resize: vertical;"></textarea>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button type="button" onclick="saveFileContent()" style="background-color: #0284c7; flex: 1;">💾 Зберегти зміни</button>
-                <button type="button" onclick="closeFileEditor()" style="background-color: #334155; flex: 1;">❌ Скасувати</button>
-            </div>
+    <header>
+        <h1>Alex-Dev-Web-C-DE</h1>
+        <div id="auth-container">
+            <button id="login-btn" onclick="loginWithGitHub()">Увійти через GitHub</button>
         </div>
-    </div>
+    </header>
 
-    <!-- Тост-сповіщення (вспливаюче вікно замість alert) -->
-    <div id="toastNotification" style="display: none; position: fixed; bottom: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; z-index: 2000; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); transition: opacity 0.3s;">
-        Успішно виконано!
-    </div>
+    <main>
+        <div class="card">
+            <h2>⚙️ Профілі налаштувань та маски</h2>
+            <p>Тут буде управління правилами та збереження вашої хмарної конфігурації.</p>
+        </div>
+    </main>
 
-    <script src="script.js"></script>
+    <script>
+        // Підключення до вашого хмарного проєкта Supabase
+        const SUPABASE_URL = 'https://kysudytgzemgxmtkhcab.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_KlDzrU7imN6UrIX2mk0DhA__KbBT6B_';
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Функція входу через GitHub
+        async function loginWithGitHub() {
+            const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'github',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
+            if (error) console.error('Помилка входу:', error.message);
+        }
+
+        // Перевірка стану сесії при завантаженні сторінки
+        async function checkUserSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const authContainer = document.getElementById('auth-container');
+            
+            if (session) {
+                authContainer.innerHTML = `
+                    <span>Вітаю, <b>${session.user.user_metadata.user_name || session.user.email}</b></span>
+                    <button onclick="logout()" style="background-color: #da3633; margin-left: 10px;">Вийти</button>
+                `;
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        // Викликаємо перевірку при завантаженні
+        checkUserSession();
+    </script>
 </body>
 </html>
